@@ -1,5 +1,5 @@
-import React, {useCallback, useContext, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking} from 'react-native';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, AppState} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import trackerApi from '../apis/tracker';
@@ -71,17 +71,36 @@ const AlertChannelScreen = () => {
     await Linking.openURL(res.data.url);
   };
 
-  const verify = () =>
-    run(async () => {
+  // The bot handles Start and the shared number; the app just follows along
+  const checkProgress = async () => {
+    try {
       const res = await trackerApi.post('/telegram/verify');
-      if (res.data.step === 'share_phone') {
-        setStep('phone');
-        return;
+      if (res.data.step === 'connected') {
+        setUser(res.data.user);
+        setStep(null);
+        setMessage({text: 'Telegram connected. Alerts will arrive there for free.', ok: true});
+      } else {
+        setStep(res.data.step);
       }
-      setUser(res.data);
+    } catch (err) {
       setStep(null);
-      setMessage({text: 'Telegram connected. Alerts will arrive there for free.', ok: true});
-    });
+      setMessage({text: errorText(err), ok: false});
+    }
+  };
+
+  // while connecting: check every few seconds and whenever the app comes back to the front
+  useEffect(() => {
+    if (!step) {
+      return;
+    }
+    const timer = setInterval(checkProgress, 3000);
+    const onAppState = state => state === 'active' && checkProgress();
+    AppState.addEventListener('change', onAppState); // RN 0.64: remove with removeEventListener
+    return () => {
+      clearInterval(timer);
+      AppState.removeEventListener('change', onAppState);
+    };
+  }, [step]);
 
   const disconnect = () =>
     run(async () => {
@@ -129,18 +148,14 @@ const AlertChannelScreen = () => {
       {step ? (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>
-            {step === 'start' ? 'Step 1 of 2: tap Start' : 'Step 2 of 2: share your number'}
+            {step === 'start' ? 'Step 1 of 2: tap Start in Telegram' : 'Step 2 of 2: share your number'}
           </Text>
           <Text style={styles.cardText}>
             {step === 'start'
-              ? 'In Telegram, tap Start in the SafeWalk bot chat, then come back here.'
-              : `In Telegram, tap “Share my phone number”. It must be ${user.phone}. Then come back here.`}
+              ? 'Telegram opened the SafeWalk bot. Tap Start there.'
+              : `In Telegram, tap the “Share my phone number” button (don't type it). It must be ${user.phone}.`}
           </Text>
-          <FormButton
-            buttonTitle={step === 'start' ? "I've pressed Start" : "I've shared my number"}
-            onPress={verify}
-            disabled={busy}
-          />
+          <Text style={styles.waiting}>Waiting for Telegram… this updates by itself.</Text>
           <FormButton buttonTitle="Open Telegram again" variant="secondary" onPress={() => run(connectTelegram)} />
         </View>
       ) : null}
@@ -190,6 +205,7 @@ const styles = StyleSheet.create({
   card: {...card, marginBottom: 12},
   cardTitle: {fontSize: 16, fontWeight: 'bold', color: colors.text},
   cardText: {fontSize: 14, color: colors.muted, marginTop: 4},
+  waiting: {fontSize: 13, color: colors.primary, marginTop: 8},
   message: {marginTop: 4, marginBottom: 4, fontSize: 14},
   link: {alignItems: 'center', marginTop: 16},
   linkText: {color: colors.danger, fontWeight: 'bold', fontSize: 15},

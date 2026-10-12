@@ -4,6 +4,8 @@ const trackReducer = (state, action) => {
   switch (action.type) {
     case 'fetch_tracks':
       return action.payload;
+    case 'clear':
+      return [];
     default:
       return state;
   }
@@ -22,6 +24,6 @@ const createTrack = dispatch => async (name, locations) => {
 
 export const {Provider, Context} = createDataContext(
   trackReducer,
-  {fetchTracks, createTrack},
+  {fetchTracks, createTrack, clearTracks: dispatch => () => dispatch({type: 'clear'})},
   [],
 );

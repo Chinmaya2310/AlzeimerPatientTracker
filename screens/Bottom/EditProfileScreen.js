@@ -29,15 +29,11 @@ const EditProfileScreen = ({navigation}) => {
   const set = key => txt => setUserData({...userData, [key]: txt});
 
   const save = async () => {
-    const dist = Number(userData.dist);
-    if (!dist || dist <= 0) {
-      return setError('Safe distance must be a number greater than 0 (in km).');
-    }
     if (!/^\d{10}$/.test(String(userData.phone || ''))) {
       return setError('Enter a 10-digit phone number for SMS alerts.');
     }
     setError('');
-    await updateUser({userData: {...userData, phone: Number(userData.phone), dist}});
+    await updateUser({userData: {...userData, phone: Number(userData.phone)}});
     navigation.goBack();
   };
 
@@ -56,14 +52,6 @@ const EditProfileScreen = ({navigation}) => {
             onChangeText={set('phone')}
             keyboardType="phone-pad"
             placeholder="10-digit mobile number"
-          />
-          <Field
-            label="Safe distance (km)"
-            hint="An alert is sent when the patient goes farther than this from where the walk started."
-            value={String(userData.dist ?? '')}
-            onChangeText={set('dist')}
-            keyboardType="decimal-pad"
-            placeholder="e.g. 0.5"
           />
           <Field label="City" value={String(userData.city ?? '')} onChangeText={set('city')} placeholder="City" />
         </View>

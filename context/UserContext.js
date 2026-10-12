@@ -6,6 +6,8 @@ const userReducer = (state, action) => {
       return {...state, user: action.payload};
     case 'update':
       return {...state, user: action.payload};
+    case 'clear':
+      return {...state, user: {}};
     default:
       return state;
   }
@@ -29,6 +31,7 @@ const updateUser = dispatch => async ({userData}) => {
       userData,
     });
     dispatch({type: 'update', payload: response.data});
+    return true;
   } catch (err) {
     console.log('updateUser failed', err.message);
     dispatch({
@@ -36,10 +39,11 @@ const updateUser = dispatch => async ({userData}) => {
       payload: 'Something went wrong while changing',
     });
   }
+  return false;
 };
 
 export const {Context, Provider} = createDataContext(
   userReducer,
-  {getInfoUser, updateUser},
+  {getInfoUser, updateUser, clearUser: dispatch => () => dispatch({type: 'clear'})},
   {user: {}},
 );

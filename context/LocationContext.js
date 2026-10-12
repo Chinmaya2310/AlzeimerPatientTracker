@@ -18,6 +18,8 @@ const locationReducer = (state, action) => {
       return {...state, user: action.payload};
     case 'reset':
       return {...state, name: '', locations: []};
+    case 'clear':
+      return {...state, name: '', locations: [], recording: false, lastAlert: null};
     case 'alert_sent':
       return {...state, lastAlert: action.payload};
     default:
@@ -41,6 +43,8 @@ const addLocation = dispatch => (location, recording) => {
     dispatch({type: 'add_location', payload: location});
   }
 };
+const clear = dispatch => () => dispatch({type: 'clear'});
+
 const reset = dispatch => () => {
   dispatch({type: 'reset'});
 };
@@ -80,6 +84,7 @@ export const {Context, Provider} = createDataContext(
     addLocation,
     changeName,
     reset,
+    clear,
     getUser,
     sendLocation,
   },

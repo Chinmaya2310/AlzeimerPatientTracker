@@ -1,20 +1,26 @@
 import React, {useCallback, useContext} from 'react';
-import {View, Text, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Context as AuthContext} from '../../context/AuthContext';
 import {Context as UserContext} from '../../context/UserContext';
+import {Context as LocationContext} from '../../context/LocationContext';
+import {Context as TrackContext} from '../../context/TrackContext';
 import Avatar from '../../components/Avatar';
 import FormButton from '../../components/FormButton';
 import {formatKm} from '../../utils/geo';
 import {colors, card} from '../../theme';
 
-const Row = ({icon, label, value, last}) => (
-  <View style={[styles.row, !last && styles.rowBorder]}>
+const Row = ({icon, label, value, last, onPress}) => (
+  <TouchableOpacity
+    disabled={!onPress}
+    onPress={onPress}
+    style={[styles.row, !last && styles.rowBorder]}>
     <Ionicons name={icon} size={20} color={colors.primary} />
     <Text style={styles.rowLabel}>{label}</Text>
     <Text style={styles.rowValue}>{value}</Text>
-  </View>
+    {onPress ? <Ionicons name="chevron-forward" size={18} color={colors.muted} /> : null}
+  </TouchableOpacity>
 );
 
 const Account = ({navigation}) => {
@@ -22,7 +28,18 @@ const Account = ({navigation}) => {
   const {
     state: {user},
     getInfoUser,
+    clearUser,
   } = useContext(UserContext);
+  const {clear: clearWalk} = useContext(LocationContext);
+  const {clearTracks} = useContext(TrackContext);
+
+  // don't leave this account's walk or profile behind for the next login
+  const logout = () => {
+    clearWalk();
+    clearTracks();
+    clearUser();
+    signout();
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -42,12 +59,17 @@ const Account = ({navigation}) => {
         <Text style={styles.section}>Alert settings</Text>
         <View style={styles.card}>
           <Row icon="call-outline" label="SMS alerts to" value={user.phone ? String(user.phone) : 'Not set'} />
-          <Row icon="shield-checkmark-outline" label="Safe distance" value={user.dist ? formatKm(user.dist) : 'Not set'} />
+          <Row
+            icon="home-outline"
+            label="Safe zone"
+            value={user.homeLocation && user.dist ? `${formatKm(user.dist)} from home` : 'Not set'}
+            onPress={() => navigation.navigate('SafeZone')}
+          />
           <Row icon="location-outline" label="City" value={user.city || 'Not set'} last />
         </View>
 
         <FormButton buttonTitle="Edit profile" onPress={() => navigation.navigate('EditProfile')} />
-        <FormButton buttonTitle="Log out" variant="secondary" onPress={signout} />
+        <FormButton buttonTitle="Log out" variant="secondary" onPress={logout} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -64,7 +86,7 @@ const styles = StyleSheet.create({
   row: {flexDirection: 'row', alignItems: 'center', paddingVertical: 14},
   rowBorder: {borderBottomWidth: 1, borderBottomColor: colors.border},
   rowLabel: {flex: 1, fontSize: 15, color: colors.text, marginLeft: 12},
-  rowValue: {fontSize: 15, fontWeight: 'bold', color: colors.text},
+  rowValue: {fontSize: 15, fontWeight: 'bold', color: colors.text, marginRight: 4},
 });
 
 export default Account;

@@ -66,6 +66,19 @@ const Home = ({navigation}) => {
         <Text style={styles.hello}>Hello, {user.name || 'Caregiver'}</Text>
         <Text style={styles.subtitle}>Keep your loved one safe on every walk.</Text>
 
+        {!user.homeLocation ? (
+          <View style={[styles.card, styles.setupCard]}>
+            <View style={styles.row}>
+              <Ionicons name="home" size={20} color={colors.primary} />
+              <Text style={[styles.statusTitle, {marginLeft: 8}]}>Set your safe zone</Text>
+            </View>
+            <Text style={styles.statusDetail}>
+              Choose the patient's home and how far they can safely go. Tracking starts after this.
+            </Text>
+            <FormButton buttonTitle="Set safe zone" onPress={() => navigation.navigate('SafeZone')} />
+          </View>
+        ) : null}
+
         <View style={[styles.card, styles.statusCard]}>
           <View style={styles.row}>
             <View
@@ -82,12 +95,16 @@ const Home = ({navigation}) => {
           </Text>
           <FormButton
             buttonTitle={locState.recording ? 'Open live map' : 'Start a walk'}
-            onPress={() => navigation.navigate('Track')}
+            onPress={() => navigation.navigate(user.homeLocation ? 'Track' : 'SafeZone')}
           />
         </View>
 
         <View style={styles.stats}>
-          <Stat icon="shield-checkmark-outline" value={user.dist ? formatKm(user.dist) : '—'} label="Safe distance" />
+          <Stat
+            icon="shield-checkmark-outline"
+            value={user.homeLocation && user.dist ? formatKm(user.dist) : 'Not set'}
+            label="Safe zone"
+          />
           <Stat icon="walk-outline" value={tracks.length} label="Walks saved" />
           <Stat icon="notifications-outline" value={alerts.length} label="Alerts sent" />
         </View>
@@ -113,7 +130,7 @@ const Home = ({navigation}) => {
               </View>
               <View style={{flex: 1}}>
                 <Text style={styles.alertTitle}>
-                  Left safe zone{a.distanceKm ? ` · ${formatKm(a.distanceKm)} from start` : ''}
+                  Left safe zone{a.distanceKm ? ` · ${formatKm(a.distanceKm)} from home` : ''}
                 </Text>
                 <Text style={styles.alertDetail}>
                   {formatDateTime(a.createdAt)} · {a.smsSent ? 'SMS sent' : 'SMS failed'}
@@ -135,6 +152,7 @@ const styles = StyleSheet.create({
   subtitle: {fontSize: 14, color: colors.muted, marginTop: 4, marginBottom: 16},
   card: {...card, marginBottom: 12},
   statusCard: {paddingBottom: 18},
+  setupCard: {paddingBottom: 18, borderWidth: 1, borderColor: colors.primary},
   row: {flexDirection: 'row', alignItems: 'center'},
   dot: {width: 10, height: 10, borderRadius: 5, marginRight: 8},
   statusTitle: {fontSize: 17, fontWeight: 'bold', color: colors.text},

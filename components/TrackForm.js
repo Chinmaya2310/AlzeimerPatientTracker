@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import FormInput from './FormInput';
 import FormButton from './FormButton';
 import {Context as LocationContext} from '../context/LocationContext';
+import {Context as UserContext} from '../context/UserContext';
 import useSaveTrack from '../hooks/useSaveTrack';
 
 const TrackForm = () => {
@@ -15,6 +16,8 @@ const TrackForm = () => {
     changeName,
   } = useContext(LocationContext);
   const [saveTrack] = useSaveTrack();
+  const {state: userState} = useContext(UserContext);
+  const hasZone = !!userState.user.homeLocation;
 
   return (
     <View style={styles.container}>
@@ -25,7 +28,9 @@ const TrackForm = () => {
         iconType="edit"
         autoCorrect={false}
       />
-      {recording ? (
+      {!hasZone && !recording ? (
+        <FormButton buttonTitle="Set safe zone to start" onPress={() => navigation.navigate('SafeZone')} />
+      ) : recording ? (
         <FormButton buttonTitle="Stop tracking" variant="danger" onPress={stopRecording} />
       ) : (
         <FormButton

@@ -16,7 +16,7 @@ export const pathLengthKm = locations =>
     0,
   );
 
-export const formatKm = km => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(2)} km`);
+export const formatKm = km => (km < 1 ? `${Math.round(km * 1000)} m` : `${parseFloat(km.toFixed(2))} km`);
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

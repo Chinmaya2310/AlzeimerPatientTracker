@@ -1,9 +1,13 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TextInput, StyleSheet} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {colors} from '../theme';
 
 const FormInput = ({labelValue, placeholderText, iconType, ...rest}) => {
+  // Android ignores the font of a password field set on first render (it falls back to
+  // monospace), so apply it again right after mount
+  const [font, setFont] = useState(undefined);
+  useEffect(() => setFont('sans-serif'), []);
   return (
     <View style={styles.container}>
       {iconType ? (
@@ -11,7 +15,7 @@ const FormInput = ({labelValue, placeholderText, iconType, ...rest}) => {
       ) : null}
       <TextInput
         value={labelValue}
-        style={styles.input}
+        style={[styles.input, {fontFamily: font}]}
         numberOfLines={1}
         placeholder={placeholderText}
         placeholderTextColor="#9BA1A6"
@@ -37,6 +41,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   icon: {marginRight: 10},
-  // explicit font: Android switches password fields to monospace otherwise
-  input: {flex: 1, fontSize: 16, color: colors.text, fontFamily: 'sans-serif'},
+  input: {flex: 1, fontSize: 16, color: colors.text},
 });

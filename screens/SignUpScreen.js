@@ -20,6 +20,12 @@ const SignupScreen = ({navigation}) => {
     if (!email || !password || !phone) {
       return setFormError('Please fill in email, password and phone number.');
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return setFormError('Enter a valid email address.');
+    }
+    if (password.length < 6) {
+      return setFormError('Password must be at least 6 characters.');
+    }
     if (!/^\d{10}$/.test(phone)) {
       return setFormError('Enter a 10-digit phone number for SMS alerts.');
     }
@@ -27,7 +33,7 @@ const SignupScreen = ({navigation}) => {
       return setFormError('Passwords do not match.');
     }
     setFormError('');
-    signup({email, password, phone});
+    signup({email: email.trim().toLowerCase(), password, phone});
   };
 
   return (

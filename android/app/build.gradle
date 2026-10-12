@@ -79,6 +79,8 @@ import com.android.build.OutputFile
 
 project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
+    // Node 20 needs the legacy OpenSSL provider for this Metro version's hashing
+    nodeExecutableAndArgs: ["node", "--openssl-legacy-provider"],
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"

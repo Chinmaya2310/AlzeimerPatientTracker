@@ -25,6 +25,8 @@ Originally built in 2021 as a team project with [Abhinav Anand](https://github.c
 - Sign up / sign in with JWT; the login persists across app restarts
 
 ## Run it (Android emulator)
+Copy `config.example.js` to `config.js` and set `API_URL` to where the backend runs (`http://10.0.2.2:3001` for the emulator, `http://<computer IP>:3001` for a phone on the same Wi-Fi). `config.js` is not committed.
+
 Google Maps needs an API key (Maps SDK for Android) in `android/local.properties`, which is not committed:
 ```
 MAPS_API_KEY=AIza...

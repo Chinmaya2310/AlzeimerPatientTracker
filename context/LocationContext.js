@@ -66,12 +66,12 @@ const sendLocation = dispatch => async ({currentLocation, dist}) => {
       currentLocation,
       dist,
     });
-    dispatch({type: 'alert_sent', payload: {...response.data.alert, smsSent: true}});
+    dispatch({type: 'alert_sent', payload: {...response.data.alert, sent: true}});
   } catch (err) {
     const alert = err.response && err.response.data && err.response.data.alert;
     dispatch({
       type: 'alert_sent',
-      payload: {...(alert || {createdAt: new Date().toISOString(), distanceKm: dist}), smsSent: false},
+      payload: {...(alert || {createdAt: new Date().toISOString(), distanceKm: dist}), sent: false},
     });
   }
 };

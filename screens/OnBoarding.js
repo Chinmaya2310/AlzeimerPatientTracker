@@ -43,8 +43,8 @@ const OnBoarding = ({navigation}) => {
         {
           backgroundColor: colors.background,
           image: <Icon name="chatbubble-ellipses" color={colors.danger} bg={colors.dangerSoft} />,
-          title: 'Get an SMS alert',
-          subtitle: 'If they leave the safe zone, you get a text with their live location on Google Maps.',
+          title: 'Get alerted',
+          subtitle: 'If they leave the safe zone, you get their live location by Telegram (free) or SMS.',
         },
       ]}
     />

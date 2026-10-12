@@ -58,7 +58,13 @@ const Account = ({navigation}) => {
 
         <Text style={styles.section}>Alert settings</Text>
         <View style={styles.card}>
-          <Row icon="call-outline" label="SMS alerts to" value={user.phone ? String(user.phone) : 'Not set'} />
+          <Row
+            icon="notifications-outline"
+            label="Alerts via"
+            value={user.alertChannel === 'telegram' ? 'Telegram' : 'SMS'}
+            onPress={() => navigation.navigate('AlertChannel')}
+          />
+          <Row icon="call-outline" label="Phone" value={user.phone ? String(user.phone) : 'Not set'} />
           <Row
             icon="home-outline"
             label="Safe zone"

@@ -44,6 +44,11 @@ const updateUser = dispatch => async ({userData}) => {
 
 export const {Context, Provider} = createDataContext(
   userReducer,
-  {getInfoUser, updateUser, clearUser: dispatch => () => dispatch({type: 'clear'})},
+  {
+    getInfoUser,
+    updateUser,
+    clearUser: dispatch => () => dispatch({type: 'clear'}),
+    setUser: dispatch => user => dispatch({type: 'update', payload: user}),
+  },
   {user: {}},
 );

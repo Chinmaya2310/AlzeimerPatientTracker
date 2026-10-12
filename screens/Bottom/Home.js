@@ -27,6 +27,12 @@ const Stat = ({icon, value, label}) => (
   </View>
 );
 
+const alertResult = a => {
+  const via = a.channel === 'telegram' ? 'Telegram' : 'SMS';
+  const ok = a.sent !== undefined ? a.sent : a.smsSent; // older alerts only have smsSent
+  return ok ? `Sent by ${via}` : `${via} failed`;
+};
+
 const Home = ({navigation}) => {
   const {state: userState, getInfoUser} = useContext(UserContext);
   const {state: tracks, fetchTracks} = useContext(TrackContext);
@@ -113,8 +119,8 @@ const Home = ({navigation}) => {
         {alerts.length === 0 ? (
           <View style={styles.card}>
             <Text style={styles.empty}>
-              No alerts yet. When the patient leaves the safe zone, the alert appears here and an SMS
-              goes to {user.phone ? user.phone : 'the caregiver'}.
+              No alerts yet. When the patient leaves the safe zone, the alert appears here and is sent
+              to the caregiver by {user.alertChannel === 'telegram' ? 'Telegram' : `SMS to ${user.phone || 'their phone'}`}.
             </Text>
           </View>
         ) : (
@@ -133,7 +139,7 @@ const Home = ({navigation}) => {
                   Left safe zone{a.distanceKm ? ` · ${formatKm(a.distanceKm)} from home` : ''}
                 </Text>
                 <Text style={styles.alertDetail}>
-                  {formatDateTime(a.createdAt)} · {a.smsSent ? 'SMS sent' : 'SMS failed'}
+                  {formatDateTime(a.createdAt)} · {alertResult(a)}
                 </Text>
               </View>
               <Ionicons name="map-outline" size={20} color={colors.muted} />

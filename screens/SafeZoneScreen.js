@@ -116,13 +116,13 @@ const SafeZoneScreen = ({navigation, route}) => {
         <>
           <Text style={styles.title}>Set up your safe zone</Text>
           <Text style={styles.subtitle}>
-            You'll get an SMS if the patient goes outside this circle. Do this at home, or move the pin
+            You'll get an alert if the patient goes outside this circle. Do this at home, or move the pin
             to the patient's home.
           </Text>
         </>
       ) : (
         <Text style={styles.subtitle}>
-          You'll get an SMS if the patient goes outside this circle. Drag the pin or tap the map to move home.
+          You'll get an alert if the patient goes outside this circle. Drag the pin or tap the map to move home.
         </Text>
       )}
 

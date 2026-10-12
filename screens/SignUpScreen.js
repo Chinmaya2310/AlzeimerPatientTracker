@@ -32,7 +32,7 @@ const SignupScreen = ({navigation}) => {
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
-      <AuthHeader title="Create an account" subtitle="Alerts will be sent by SMS to the phone number below." />
+      <AuthHeader title="Create an account" subtitle="Alerts go by SMS to this phone, or free on Telegram (set it up in Profile)." />
       <FormInput
         labelValue={email}
         onChangeText={setEmail}
@@ -45,7 +45,7 @@ const SignupScreen = ({navigation}) => {
       <FormInput
         labelValue={phone}
         onChangeText={setPhone}
-        placeholderText="Caregiver phone (for SMS alerts)"
+        placeholderText="Caregiver phone number"
         iconType="phone"
         keyboardType="phone-pad"
       />

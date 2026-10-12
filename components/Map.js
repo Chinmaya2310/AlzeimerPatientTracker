@@ -76,9 +76,9 @@ const Map = () => {
       detail: !recording
         ? 'Start tracking to alert the caregiver.'
         : lastAlert
-        ? lastAlert.smsSent
-          ? `Caregiver alerted by SMS at ${formatDateTime(lastAlert.createdAt)}`
-          : 'Could not send the SMS alert. Check the backend.'
+        ? lastAlert.sent
+          ? `Caregiver alerted by ${lastAlert.channel === 'telegram' ? 'Telegram' : 'SMS'} at ${formatDateTime(lastAlert.createdAt)}`
+          : 'Could not send the alert. Check the alert settings in Profile.'
         : 'Alerting caregiver…',
     };
   } else {

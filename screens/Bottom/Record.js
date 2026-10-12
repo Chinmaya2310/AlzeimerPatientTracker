@@ -23,7 +23,7 @@ const Record = () => {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Track a walk</Text>
         <Text style={styles.subtitle}>
-          The caregiver gets one SMS each time the patient leaves the safe zone.
+          The caregiver gets one alert each time the patient leaves the safe zone.
         </Text>
         <Maps />
         {err ? <Text style={styles.error}>Please enable location services</Text> : null}

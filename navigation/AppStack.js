@@ -4,6 +4,7 @@ import Landing from '../screens/Landing';
 import TrackDetails from '../screens/TrackDetails';
 import EditProfileScreen from '../screens/Bottom/EditProfileScreen';
 import SafeZoneScreen from '../screens/SafeZoneScreen';
+import AlertChannelScreen from '../screens/AlertChannelScreen';
 import {Context as AuthContext} from '../context/AuthContext';
 const Stack = createStackNavigator();
 
@@ -24,6 +25,11 @@ const AppStack = () => {
         name="SafeZone"
         component={SafeZoneScreen}
         options={{title: 'Safe zone', headerTitleAlign: 'center'}}
+      />
+      <Stack.Screen
+        name="AlertChannel"
+        component={AlertChannelScreen}
+        options={{title: 'Alerts', headerTitleAlign: 'center'}}
       />
       <Stack.Screen
         name="TrackDetails"

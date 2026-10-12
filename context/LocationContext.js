@@ -7,7 +7,7 @@ const locationReducer = (state, action) => {
     case 'add_current_location':
       return {...state, currentLocation: action.payload};
     case 'start_recording':
-      return {...state, recording: true};
+      return {...state, recording: true, lastAlert: null};
     case 'stop_recording':
       return {...state, recording: false};
     case 'add_location':
@@ -18,8 +18,8 @@ const locationReducer = (state, action) => {
       return {...state, user: action.payload};
     case 'reset':
       return {...state, name: '', locations: []};
-    case 'nothing_user':
-      return state;
+    case 'alert_sent':
+      return {...state, lastAlert: action.payload};
     default:
       return state;
   }
@@ -62,11 +62,12 @@ const sendLocation = dispatch => async ({currentLocation, dist}) => {
       currentLocation,
       dist,
     });
-    dispatch({type: 'nothing_user', payload: response});
+    dispatch({type: 'alert_sent', payload: {...response.data.alert, smsSent: true}});
   } catch (err) {
+    const alert = err.response && err.response.data && err.response.data.alert;
     dispatch({
-      type: 'add_error',
-      payload: 'Something went wrong with signup',
+      type: 'alert_sent',
+      payload: {...(alert || {createdAt: new Date().toISOString(), distanceKm: dist}), smsSent: false},
     });
   }
 };
@@ -82,5 +83,5 @@ export const {Context, Provider} = createDataContext(
     getUser,
     sendLocation,
   },
-  {name: '', recording: false, locations: [], currentLocation: null, user: {}},
+  {name: '', recording: false, locations: [], currentLocation: null, user: {}, lastAlert: null},
 );

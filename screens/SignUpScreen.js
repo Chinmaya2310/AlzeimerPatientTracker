@@ -1,122 +1,78 @@
-import React, {useContext, useState} from 'react';
-import {View, Text, TouchableOpacity, Platform, StyleSheet} from 'react-native';
+import React, {useContext, useState, useCallback} from 'react';
+import {Text, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
-import SocialButton from '../components/SocialButton';
+import AuthHeader from '../components/AuthHeader';
 import {Context as AuthContext} from '../context/AuthContext';
+import {colors} from '../theme';
 
 const SignupScreen = ({navigation}) => {
-  const {state, signup} = useContext(AuthContext);
-  const [email, setEmail] = useState();
-  const [phone, setPhone] = useState();
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
+  const {state, signup, clearError} = useContext(AuthContext);
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState('');
+  useFocusEffect(useCallback(() => clearError(), []));
+
   const onSignUp = () => {
     if (!email || !password || !phone) {
-      return setFormError('Please fill in email, password and phone number');
+      return setFormError('Please fill in email, password and phone number.');
+    }
+    if (!/^\d{10}$/.test(phone)) {
+      return setFormError('Enter a 10-digit phone number for SMS alerts.');
     }
     if (password !== confirmPassword) {
-      return setFormError('Passwords do not match');
+      return setFormError('Passwords do not match.');
     }
     setFormError('');
     signup({email, password, phone});
   };
-  // console.log(state);
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Create an account</Text>
 
+  return (
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
+      <AuthHeader title="Create an account" subtitle="Alerts will be sent by SMS to the phone number below." />
       <FormInput
         labelValue={email}
-        onChangeText={userEmail => setEmail(userEmail)}
+        onChangeText={setEmail}
         placeholderText="Email"
-        iconType="user"
+        iconType="mail"
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
       />
-
+      <FormInput
+        labelValue={phone}
+        onChangeText={setPhone}
+        placeholderText="Caregiver phone (for SMS alerts)"
+        iconType="phone"
+        keyboardType="phone-pad"
+      />
       <FormInput
         labelValue={password}
-        onChangeText={userPassword => setPassword(userPassword)}
+        onChangeText={setPassword}
         placeholderText="Password"
         iconType="lock"
         secureTextEntry={true}
       />
-
       <FormInput
         labelValue={confirmPassword}
-        onChangeText={userPassword => setConfirmPassword(userPassword)}
-        placeholderText="Confirm Password"
+        onChangeText={setConfirmPassword}
+        placeholderText="Confirm password"
         iconType="lock"
         secureTextEntry={true}
       />
-      <FormInput
-        labelValue={phone}
-        onChangeText={userPhone => setPhone(userPhone)}
-        placeholderText="Phone Number"
-        iconType="phone"
-        keyboardType="phone-pad"
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
-
-      <FormButton
-        buttonTitle="Sign Up"
-        onPress={onSignUp}
-      />
-      {formError ? (
-        <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
-          {formError}
-        </Text>
+      {formError || state.errMessage ? (
+        <Text style={styles.error}>{formError || state.errMessage}</Text>
       ) : null}
-      {state.errMessage ? (
-        <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
-          {state.errMessage}
+      <FormButton buttonTitle="Create account" onPress={onSignUp} />
+      <TouchableOpacity style={styles.link} onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.linkText}>
+          Already have an account? <Text style={styles.linkStrong}>Sign in</Text>
         </Text>
-      ) : null}
-      <View style={styles.textPrivate}>
-        <Text style={styles.color_textPrivate}>
-          By registering, you confirm that you accept our{' '}
-        </Text>
-        <TouchableOpacity onPress={() => alert('Terms Clicked!')}>
-          <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
-            Terms of service
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.color_textPrivate}> and </Text>
-        <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
-          Privacy Policy
-        </Text>
-      </View>
-
-      {Platform.OS === 'android' ? (
-        <View>
-          <SocialButton
-            buttonTitle="Sign Up with Facebook"
-            btnType="facebook"
-            color="#4867aa"
-            backgroundColor="#e6eaf4"
-            onPress={() => {}}
-          />
-
-          <SocialButton
-            buttonTitle="Sign Up with Google"
-            btnType="google"
-            color="#de4d41"
-            backgroundColor="#f5e7ea"
-            onPress={() => {}}
-          />
-        </View>
-      ) : null}
-
-      <TouchableOpacity
-        style={styles.navButton}
-        onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.navButtonText}>Have an account? Sign In</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -124,37 +80,13 @@ export default SignupScreen;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9fafd',
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    padding: 24,
+    backgroundColor: colors.background,
   },
-  text: {
-    fontFamily: 'Kufam-SemiBoldItalic',
-    fontSize: 28,
-    marginBottom: 10,
-    color: '#051d5f',
-  },
-  navButton: {
-    marginTop: 15,
-  },
-  navButtonText: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#2e64e5',
-    fontFamily: 'Lato-Regular',
-  },
-  textPrivate: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginVertical: 35,
-    justifyContent: 'center',
-  },
-  color_textPrivate: {
-    fontSize: 13,
-    fontWeight: '400',
-    fontFamily: 'Lato-Regular',
-    color: 'grey',
-  },
+  error: {color: colors.danger, marginTop: 6},
+  link: {marginTop: 24, alignItems: 'center'},
+  linkText: {fontSize: 15, color: colors.muted},
+  linkStrong: {color: colors.primary, fontWeight: 'bold'},
 });

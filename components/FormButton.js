@@ -1,12 +1,17 @@
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import {Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {windowHeight, windowWidth} from '../utils/Dimension';
+import {colors} from '../theme';
 
-const FormButton = ({buttonTitle, ...rest}) => {
+// variant: 'primary' | 'secondary' | 'danger'
+const FormButton = ({buttonTitle, variant = 'primary', style, ...rest}) => {
   return (
-    <TouchableOpacity style={styles.buttonContainer} {...rest}>
-      <Text style={styles.buttonText}>{buttonTitle}</Text>
+    <TouchableOpacity
+      style={[styles.button, styles[variant], style]}
+      activeOpacity={0.8}
+      {...rest}>
+      <Text style={[styles.text, variant === 'secondary' && styles.secondaryText]}>
+        {buttonTitle}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -14,20 +19,21 @@ const FormButton = ({buttonTitle, ...rest}) => {
 export default FormButton;
 
 const styles = StyleSheet.create({
-  buttonContainer: {
+  button: {
     marginTop: 10,
     width: '100%',
-    height: windowHeight / 15,
-    backgroundColor: '#2e64e5',
-    padding: 10,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 3,
+    borderRadius: 12,
   },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    fontFamily: 'Lato-Regular',
+  primary: {backgroundColor: colors.primary},
+  danger: {backgroundColor: colors.danger},
+  secondary: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
+  text: {fontSize: 16, fontWeight: 'bold', color: '#fff'},
+  secondaryText: {color: colors.text},
 });

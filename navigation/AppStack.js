@@ -17,13 +17,13 @@ const AppStack = () => {
       <Stack.Screen
         name="TrackDetails"
         component={TrackDetails}
-        options={{title: 'Track', headerTitleAlign: 'center'}}
+        options={{title: 'Walk', headerTitleAlign: 'center'}}
       />
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}
         options={{
-          headerTitle: 'Edit Profile',
+          headerTitle: 'Edit profile',
           headerTitleAlign: 'center',
           headerStyle: {backgroundColor: '#fff', elevation: 0},
         }}

@@ -1,108 +1,59 @@
-import React, {useContext, useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import {windowHeight, windowWidth} from '../utils/Dimension';
+import React, {useContext, useState, useCallback} from 'react';
+import {Text, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
+import AuthHeader from '../components/AuthHeader';
 import {Context as AuthContext} from '../context/AuthContext';
-import Lost from '../assets/lost.svg';
-import {AsyncStorage} from 'react-native';
+import {colors} from '../theme';
+
 const LoginScreen = ({navigation}) => {
-  const {state, signin} = useContext(AuthContext);
+  const {state, signin, clearError} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const page = 'Login';
-  if (page === 'Login') {
-    return (
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
-        {/* <Image source={require('../assets/AA.jpg')} style={styles.logo} /> */}
-        <Lost
-          style={styles.logo}
-          height={windowHeight / 5}
-          width={windowWidth / 2}
-        />
-        <Text style={styles.text}>Location Tracker App</Text>
+  useFocusEffect(useCallback(() => clearError(), []));
 
-        <FormInput
-          labelValue={email}
-          onChangeText={userEmail => setEmail(userEmail)}
-          placeholderText="Email"
-          iconType="user"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-
-        <FormInput
-          labelValue={password}
-          onChangeText={userPassword => setPassword(userPassword)}
-          placeholderText="Password"
-          iconType="lock"
-          secureTextEntry={true}
-        />
-
-        <FormButton
-          buttonTitle="Sign In"
-          onPress={() => signin({email, password})}
-        />
-
-        <TouchableOpacity style={styles.forgotButton} onPress={() => {}}>
-          <Text style={styles.navButtonText}>Forgot Password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.forgotButton}
-          onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.navButtonText}>
-            Don't have an acount? Create here
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    );
-  } else {
-    return (
-      <View>
-        <Text>Loading</Text>
-      </View>
-    );
-  }
+  return (
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
+      <AuthHeader title="SafeWalk" subtitle="Location alerts for people living with Alzheimer's" />
+      <FormInput
+        labelValue={email}
+        onChangeText={setEmail}
+        placeholderText="Email"
+        iconType="mail"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      <FormInput
+        labelValue={password}
+        onChangeText={setPassword}
+        placeholderText="Password"
+        iconType="lock"
+        secureTextEntry={true}
+      />
+      {state.errMessage ? <Text style={styles.error}>{state.errMessage}</Text> : null}
+      <FormButton buttonTitle="Sign in" onPress={() => signin({email, password})} />
+      <TouchableOpacity style={styles.link} onPress={() => navigation.navigate('Signup')}>
+        <Text style={styles.linkText}>
+          New here? <Text style={styles.linkStrong}>Create an account</Text>
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
 };
 
 export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 50,
+    padding: 24,
+    backgroundColor: colors.background,
   },
-  logo: {
-    height: 150,
-    width: 150,
-    resizeMode: 'cover',
-  },
-  text: {
-    fontFamily: 'Kufam-SemiBoldItalic',
-    fontSize: 28,
-    marginBottom: 10,
-    color: '#051d5f',
-  },
-  navButton: {
-    marginTop: 15,
-  },
-  forgotButton: {
-    marginVertical: 35,
-  },
-  navButtonText: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#2e64e5',
-    fontFamily: 'Lato-Regular',
-  },
+  error: {color: colors.danger, marginTop: 6},
+  link: {marginTop: 24, alignItems: 'center'},
+  linkText: {fontSize: 15, color: colors.muted},
+  linkStrong: {color: colors.primary, fontWeight: 'bold'},
 });

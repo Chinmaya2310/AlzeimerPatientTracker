@@ -1,58 +1,42 @@
-import React, {useContext} from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './Bottom/Home';
 import Account from './Bottom/Account';
 import Maps from './Bottom/Maps';
 import Record from './Bottom/Record';
-const Landing = () => {
-  // const {state, signin} = useContext(AuthContext);
-  const Tab = createBottomTabNavigator();
+import {colors} from '../theme';
 
+const Tab = createBottomTabNavigator();
+const tabs = [
+  {name: 'Home', component: Home, icon: 'home'},
+  {name: 'Track', component: Record, icon: 'navigate'},
+  {name: 'History', component: Maps, icon: 'time'},
+  {name: 'Profile', component: Account, icon: 'person'},
+];
+
+const Landing = () => {
   return (
-    <Tab.Navigator initialRouteName="Home" activeColor="#fff">
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarColor: '#009387',
-          tabBarIcon: ({color}) => (
-            <Icon name="ios-home" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Explore"
-        component={Record}
-        options={{
-          tabBarLabel: 'Record',
-          tabBarColor: '#d02860',
-          tabBarIcon: ({color}) => (
-            <Icon name="recording" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Notifications"
-        component={Maps}
-        options={{
-          tabBarLabel: 'Notifications',
-          tabBarColor: '#1f65ff',
-          tabBarIcon: ({color}) => <Icon name="map" color={color} size={26} />,
-        }}
-      />
-      <Tab.Screen
-        name="Account"
-        component={Account}
-        options={{
-          tabBarLabel: 'Account',
-          tabBarColor: '#694fad',
-          tabBarIcon: ({color}) => (
-            <Icon name="ios-person" color={color} size={26} />
-          ),
-        }}
-      />
+    <Tab.Navigator
+      initialRouteName="Home"
+      tabBarOptions={{
+        activeTintColor: colors.primary,
+        inactiveTintColor: colors.muted,
+        labelStyle: {fontSize: 12, fontWeight: 'bold'},
+        style: {height: 60, paddingBottom: 8, paddingTop: 6},
+      }}>
+      {tabs.map(t => (
+        <Tab.Screen
+          key={t.name}
+          name={t.name}
+          component={t.component}
+          options={{
+            tabBarIcon: ({color, focused}) => (
+              <Ionicons name={focused ? t.icon : `${t.icon}-outline`} color={color} size={24} />
+            ),
+          }}
+        />
+      ))}
     </Tab.Navigator>
   );
 };

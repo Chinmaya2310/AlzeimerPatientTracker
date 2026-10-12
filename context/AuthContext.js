@@ -1,6 +1,6 @@
 import createDataContext from './createDataContext';
 import trackerApi from '../apis/tracker';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {navigate} from '../navigation/navigationRef';
 const authReducer = (state, action) => {
   switch (action.type) {
@@ -8,6 +8,8 @@ const authReducer = (state, action) => {
       return {...state, errMessage: action.payload};
     case 'signin':
       return {errMessage: '', token: action.payload};
+    case 'clear_error':
+      return {...state, errMessage: ''};
     case 'signout':
       return {token: null, errorMessage: ''};
     default:
@@ -23,7 +25,7 @@ const signup = dispatch => async ({email, password, phone}) => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: 'Something went wrong with signup',
+      payload: 'Could not create the account. This email may already be registered.',
     });
   }
 };
@@ -37,7 +39,7 @@ const signin = dispatch => async ({email, password}) => {
   } catch (err) {
     dispatch({
       type: 'add_error',
-      payload: 'Something went wrong with signup',
+      payload: 'Wrong email or password.',
     });
   }
 };
@@ -49,6 +51,8 @@ const tryLocalSignin = dispatch => async () => {
   }
 };
 
+const clearError = dispatch => () => dispatch({type: 'clear_error'});
+
 const signout = dispatch => async () => {
   await AsyncStorage.removeItem('token');
   dispatch({type: 'signout'});
@@ -57,6 +61,6 @@ const signout = dispatch => async () => {
 
 export const {Provider, Context} = createDataContext(
   authReducer,
-  {signin, signout, signup, tryLocalSignin},
+  {signin, signout, signup, tryLocalSignin, clearError},
   {token: '', errMessage: ''},
 );

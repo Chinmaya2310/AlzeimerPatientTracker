@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useContext, useCallback, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Text} from 'react-native-elements';
-import {SafeAreaView} from 'react-navigation';
+import React, {useContext, useCallback} from 'react';
+import {View, Text, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
 import {useIsFocused} from '@react-navigation/native';
 import useLocation from '../../hooks/useLocation';
 import {Context as LocationContext} from '../../context/LocationContext';
 import Maps from '../../components/Map';
 import TrackForm from '../../components/TrackForm';
+import {colors} from '../../theme';
+
 const Record = () => {
   const {state, addLocation} = useContext(LocationContext);
   const isFocused = useIsFocused();
@@ -19,22 +19,26 @@ const Record = () => {
   );
   const [err] = useLocation(isFocused || state.recording, callback);
   return (
-    <SafeAreaView forceInset={{top: 'always'}}>
-      <View style={styles.container}>
-        <Text h2>Start Tracking</Text>
-      </View>
-      <Maps />
-      {err ? <Text>Please Enable location services</Text> : null}
-      <TrackForm />
+    <SafeAreaView style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>Track a walk</Text>
+        <Text style={styles.subtitle}>
+          The caregiver gets one SMS each time the patient leaves the safe zone.
+        </Text>
+        <Maps />
+        {err ? <Text style={styles.error}>Please enable location services</Text> : null}
+        <TrackForm />
+      </ScrollView>
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    paddingTop: 20,
-  },
+  screen: {flex: 1, backgroundColor: colors.background},
+  content: {padding: 20},
+  title: {fontSize: 26, fontWeight: 'bold', color: colors.text},
+  subtitle: {fontSize: 14, color: colors.muted, marginTop: 4, marginBottom: 16},
+  error: {color: colors.danger, marginTop: 8},
 });
+
 export default Record;

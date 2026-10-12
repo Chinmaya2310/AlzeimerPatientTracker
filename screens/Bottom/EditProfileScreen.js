@@ -1,27 +1,23 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useContext, useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ImageBackground,
-  TextInput,
-  ScrollView,
-  KeyboardAvoidingView,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import UserAvatar from 'react-native-user-avatar';
+import {View, Text, TextInput, ScrollView, KeyboardAvoidingView, StyleSheet} from 'react-native';
 import {Context as UserContext} from '../../context/UserContext';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
+import Avatar from '../../components/Avatar';
 import FormButton from '../../components/FormButton';
+import {colors, card} from '../../theme';
 
-const EditProfileScreen = props => {
-  // console.log(props);
+const Field = ({label, hint, ...rest}) => (
+  <View style={styles.field}>
+    <Text style={styles.label}>{label}</Text>
+    <TextInput style={styles.input} placeholderTextColor="#9BA1A6" {...rest} />
+    {hint ? <Text style={styles.hint}>{hint}</Text> : null}
+  </View>
+);
+
+const EditProfileScreen = ({navigation}) => {
   const [userData, setUserData] = useState({});
+  const [error, setError] = useState('');
   const {state, getInfoUser, updateUser} = useContext(UserContext);
+
   useEffect(() => {
     getInfoUser();
   }, []);
@@ -30,226 +26,73 @@ const EditProfileScreen = props => {
     setUserData(state.user);
   }, [state.user]);
 
-  const upadateProfile = async () => {
-    await updateUser({
-      userData: {
-        ...userData,
-        phone: Number(userData.phone),
-        dist: Number(userData.dist),
-      },
-    });
-    props.navigation.goBack();
+  const set = key => txt => setUserData({...userData, [key]: txt});
+
+  const save = async () => {
+    const dist = Number(userData.dist);
+    if (!dist || dist <= 0) {
+      return setError('Safe distance must be a number greater than 0 (in km).');
+    }
+    if (!/^\d{10}$/.test(String(userData.phone || ''))) {
+      return setError('Enter a 10-digit phone number for SMS alerts.');
+    }
+    setError('');
+    await updateUser({userData: {...userData, phone: Number(userData.phone), dist}});
+    navigation.goBack();
   };
+
   return (
-    <View style={styles.container}>
-      <View style={{margin: 20, flex: 1}}>
-        <View style={{alignItems: 'center'}}>
-          <TouchableOpacity disabled>
-            <View
-              style={{
-                height: 100,
-                width: 100,
-                borderRadius: 15,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <UserAvatar
-                size={200}
-                style={styles.userImg}
-                // textStyle={{size: 150}}
-                name={userData.name ? String(userData.name) : 'Abhinav Anand'}
-              />
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <MaterialCommunityIcons
-                  name="camera"
-                  size={35}
-                  color="#fff"
-                  style={{
-                    opacity: 0.7,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 1,
-                    borderColor: '#fff',
-                    borderRadius: 10,
-                  }}
-                />
-              </View>
-            </View>
-          </TouchableOpacity>
-          <Text style={{marginTop: 10, fontSize: 18, fontWeight: 'bold'}}>
-            {userData ? userData.fname : ''} {userData ? userData.lname : ''}
-          </Text>
-          {/* <Text>{user.uid}</Text> */}
+    <KeyboardAvoidingView style={styles.screen} behavior="height">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.header}>
+          <Avatar name={userData.name} email={userData.email} size={80} />
+          <Text style={styles.email}>{userData.email}</Text>
         </View>
-        <KeyboardAvoidingView behavior="height">
-          <ScrollView keyboardShouldPersistTaps="handled">
-            <View>
-              <View style={styles.action}>
-                <FontAwesome name="user-circle" color="#333333" size={20} />
-                <TextInput
-                  placeholder="Email"
-                  placeholderTextColor="grey"
-                  autoCorrect={false}
-                  value={String(userData.email ?? '')}
-                  onChangeText={txt => setUserData({...userData, email: txt})}
-                  style={styles.textInput}
-                  editable={false}
-                  selectTextOnFocus={false}
-                />
-              </View>
-              <View style={styles.action}>
-                <FontAwesome name="user-o" color="#333333" size={20} />
-                <TextInput
-                  placeholder="Name"
-                  placeholderTextColor="#666666"
-                  value={String(userData.name ?? '')}
-                  onChangeText={txt => setUserData({...userData, name: txt})}
-                  autoCorrect={false}
-                  style={styles.textInput}
-                />
-              </View>
-
-              <View style={styles.action}>
-                <Feather name="phone" color="#333333" size={20} />
-                <TextInput
-                  placeholder="Phone"
-                  placeholderTextColor="#666666"
-                  keyboardType="number-pad"
-                  autoCorrect={false}
-                  value={String(userData.phone ?? '')}
-                  onChangeText={txt => setUserData({...userData, phone: txt})}
-                  style={styles.textInput}
-                />
-              </View>
-
-              <View style={styles.action}>
-                <FontAwesome name="globe" color="#333333" size={20} />
-                <TextInput
-                  placeholder="Maximum Distance you want to travel"
-                  placeholderTextColor="#666666"
-                  autoCorrect={false}
-                  keyboardType="number-pad"
-                  value={String(userData.dist ?? '')}
-                  onChangeText={txt => setUserData({...userData, dist: txt})}
-                  style={styles.textInput}
-                />
-              </View>
-              <View style={styles.action}>
-                <MaterialCommunityIcons
-                  name="map-marker-outline"
-                  color="#333333"
-                  size={20}
-                />
-                <TextInput
-                  placeholder="City"
-                  placeholderTextColor="#666666"
-                  autoCorrect={false}
-                  value={String(userData.city ?? '')}
-                  onChangeText={txt => setUserData({...userData, city: txt})}
-                  style={styles.textInput}
-                />
-              </View>
-            </View>
-            <FormButton buttonTitle="Update" onPress={upadateProfile} />
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </View>
-    </View>
+        <View style={styles.card}>
+          <Field label="Caregiver name" value={String(userData.name ?? '')} onChangeText={set('name')} placeholder="Your name" />
+          <Field
+            label="Phone for SMS alerts"
+            value={String(userData.phone ?? '')}
+            onChangeText={set('phone')}
+            keyboardType="phone-pad"
+            placeholder="10-digit mobile number"
+          />
+          <Field
+            label="Safe distance (km)"
+            hint="An alert is sent when the patient goes farther than this from where the walk started."
+            value={String(userData.dist ?? '')}
+            onChangeText={set('dist')}
+            keyboardType="decimal-pad"
+            placeholder="e.g. 0.5"
+          />
+          <Field label="City" value={String(userData.city ?? '')} onChangeText={set('city')} placeholder="City" />
+        </View>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <FormButton buttonTitle="Save changes" onPress={save} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-export default EditProfileScreen;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  commandButton: {
-    padding: 15,
+  screen: {flex: 1, backgroundColor: colors.background},
+  content: {padding: 20},
+  header: {alignItems: 'center', marginBottom: 16},
+  email: {fontSize: 14, color: colors.muted, marginTop: 8},
+  card: {...card},
+  field: {marginBottom: 14},
+  label: {fontSize: 13, fontWeight: 'bold', color: colors.muted, marginBottom: 6},
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: 10,
-    backgroundColor: '#FF6347',
-    alignItems: 'center',
-    marginTop: 10,
+    paddingHorizontal: 12,
+    height: 46,
+    fontSize: 16,
+    color: colors.text,
   },
-  panel: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    paddingTop: 20,
-    width: '100%',
-  },
-  userImg: {
-    marginTop: 10,
-    height: 150,
-    width: 150,
-    borderRadius: 75,
-  },
-  header: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#333333',
-    shadowOffset: {width: -1, height: -3},
-    shadowRadius: 2,
-    shadowOpacity: 0.4,
-    paddingTop: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  panelHeader: {
-    alignItems: 'center',
-  },
-  panelHandle: {
-    width: 40,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#00000040',
-    marginBottom: 10,
-  },
-  panelTitle: {
-    fontSize: 27,
-    height: 35,
-  },
-  panelSubtitle: {
-    fontSize: 14,
-    color: 'gray',
-    height: 30,
-    marginBottom: 10,
-  },
-  panelButton: {
-    padding: 13,
-    borderRadius: 10,
-    backgroundColor: '#2e64e5',
-    alignItems: 'center',
-    marginVertical: 7,
-  },
-  panelButtonTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  action: {
-    flexDirection: 'row',
-    marginTop: 10,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f2f2f2',
-    paddingBottom: 5,
-  },
-  actionError: {
-    flexDirection: 'row',
-    marginTop: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#FF0000',
-    paddingBottom: 5,
-  },
-  textInput: {
-    flex: 1,
-    marginTop: Platform.OS === 'ios' ? 0 : -12,
-    paddingLeft: 10,
-    color: '#333333',
-  },
+  hint: {fontSize: 12, color: colors.muted, marginTop: 4},
+  error: {color: colors.danger, marginTop: 10},
 });
+
+export default EditProfileScreen;

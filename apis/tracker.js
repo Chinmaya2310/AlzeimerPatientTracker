@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const instance = axios.create({
   // 10.0.2.2 is the host machine as seen from the Android emulator
   baseURL: 'http://10.0.2.2:3001',

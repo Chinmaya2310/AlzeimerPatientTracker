@@ -1,3 +1,5 @@
+// TextEncoder/TextDecoder for the QR code library (missing from this RN version's JS engine)
+import 'fast-text-encoding';
 /**
  * @format
  */

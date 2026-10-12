@@ -1,25 +1,20 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useEffect, useContext, useRef} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
-import Geolocation from '@react-native-community/geolocation';
 import MapView, {Polyline, Circle} from 'react-native-maps';
 import {Context as LocationContext} from '../context/LocationContext';
 import {Context as UserContext} from '../context/UserContext';
-
-
-
 const Map = () => {
   const {state, getInfoUser} = useContext(UserContext);
-
   const {
-    state: {name, recording,currentLocation, locations},
-    sendMessage
+    state: {currentLocation, locations},
+    sendLocation,
   } = useContext(LocationContext);
- /* useEffect(() => {
+  useEffect(() => {
     const aa = async () => {
       await getInfoUser();
     };
     aa();
-  }, [state.user.email]);*/
+  }, [state.user.email]);
   const distance = (lat1, lat2, lon1, lon2) => {
     lon1 = (lon1 * Math.PI) / 180;
     lon2 = (lon2 * Math.PI) / 180;
@@ -37,44 +32,27 @@ const Map = () => {
 
     return c * r;
   };
- 
-  console.log(currentLocation);
 
-
-  
-  if (locations[0]) {
+  // Alert once each time the patient leaves the safe area, not on every render
+  const alertSent = useRef(false);
+  useEffect(() => {
+    if (!locations[0] || !currentLocation || !state.user.dist) {
+      return;
+    }
     const start = locations[0];
-    const last = locations[locations.length - 1];
-
-    console.log('Start', start);
-    console.log('Last', last);
-    
     const dist = distance(
       start.coords.latitude,
-      last.coords.latitude,
+      currentLocation.coords.latitude,
       start.coords.longitude,
-      last.coords.longitude,
+      currentLocation.coords.longitude,
     );
-
-    const check=({currentLocation,dist})=>{
-      console.log('Distance at last', dist);
-      sendMessage({currentLocation, dist});
-    };
-    console.log('Distance ', dist);
-    if (dist > 0.2) {
-      useEffect(()=>{
-
-        const ab = async () => {
-      await check({currentLocation,dist});
-    };
-    ab();
-      },[])
-      
+    if (dist > state.user.dist && !alertSent.current) {
+      alertSent.current = true;
+      sendLocation({currentLocation, dist});
+    } else if (dist <= state.user.dist) {
+      alertSent.current = false;
     }
-  }
-
-
-
+  }, [currentLocation, locations, state.user.dist]);
   if (!currentLocation) {
     return <ActivityIndicator size="large" style={{marginTop: 200}} />;
   }

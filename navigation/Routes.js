@@ -1,15 +1,21 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import AuthStack from './AuthStack';
-import Landing from '../screens/Landing';
+import AppStack from './AppStack';
 import {Context as AuthContext} from '../context/AuthContext';
 
 const Routes = () => {
-  const {state, signup} = useContext(AuthContext);
-  console.log(state);
+  const {state, tryLocalSignin} = useContext(AuthContext);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    tryLocalSignin().finally(() => setReady(true));
+  }, []);
+  if (!ready) {
+    return null;
+  }
   return (
     <NavigationContainer>
-      {state.token ? <Landing /> : <AuthStack />}
+      {state.token ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

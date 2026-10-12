@@ -14,6 +14,7 @@ buildscript {
     }
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -36,7 +37,20 @@ allprojects {
         }
 
         google()
+        mavenCentral()
         jcenter()
         maven { url 'https://www.jitpack.io' }
+    }
+}
+
+// Fresco 2.0.0-2.2.0 was only published on JCenter, which has shut down.
+// 2.3.0 is on Maven Central and is compatible with React Native 0.64.
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == "com.facebook.fresco") {
+                details.useVersion "2.3.0"
+            }
+        }
     }
 }

@@ -28,9 +28,9 @@ const updateUser = dispatch => async ({userData}) => {
     const response = await trackerApi.put('/operationUser', {
       userData,
     });
-    // console.log(response);
-    dispatch({type: 'update', payload: userData});
+    dispatch({type: 'update', payload: response.data});
   } catch (err) {
+    console.log('updateUser failed', err.message);
     dispatch({
       type: 'add_error',
       payload: 'Something went wrong while changing',

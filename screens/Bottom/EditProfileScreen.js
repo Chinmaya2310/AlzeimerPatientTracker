@@ -17,37 +17,34 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import FormButton from '../../components/FormButton';
-import Animated from 'react-native-reanimated';
 
 const EditProfileScreen = props => {
   // console.log(props);
   const [userData, setUserData] = useState({});
   const {state, getInfoUser, updateUser} = useContext(UserContext);
   useEffect(() => {
-    const aa = async () => {
-      await getInfoUser();
-    };
-    aa();
+    getInfoUser();
+  }, []);
+  // fill the form once the profile has loaded
+  useEffect(() => {
     setUserData(state.user);
-  }, [state.user.email]);
-  const bs = React.createRef();
-  const fall = new Animated.Value(1);
+  }, [state.user]);
 
-  const upadateProfile = () => {
-    if (userData !== {}) {
-      updateUser({userData});
-      props.navigation.navigate('Login');
-    }
+  const upadateProfile = async () => {
+    await updateUser({
+      userData: {
+        ...userData,
+        phone: Number(userData.phone),
+        dist: Number(userData.dist),
+      },
+    });
+    props.navigation.goBack();
   };
   return (
     <View style={styles.container}>
-      <Animated.View
-        style={{
-          margin: 20,
-          opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)),
-        }}>
+      <View style={{margin: 20, flex: 1}}>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity onPress={() => bs.current.snapTo(0)}>
+          <TouchableOpacity disabled>
             <View
               style={{
                 height: 100,
@@ -90,7 +87,7 @@ const EditProfileScreen = props => {
           {/* <Text>{user.uid}</Text> */}
         </View>
         <KeyboardAvoidingView behavior="height">
-          <ScrollView>
+          <ScrollView keyboardShouldPersistTaps="handled">
             <View>
               <View style={styles.action}>
                 <FontAwesome name="user-circle" color="#333333" size={20} />
@@ -98,7 +95,7 @@ const EditProfileScreen = props => {
                   placeholder="Email"
                   placeholderTextColor="grey"
                   autoCorrect={false}
-                  value={userData.email ? userData.email : state.user.email}
+                  value={String(userData.email ?? '')}
                   onChangeText={txt => setUserData({...userData, email: txt})}
                   style={styles.textInput}
                   editable={false}
@@ -110,7 +107,7 @@ const EditProfileScreen = props => {
                 <TextInput
                   placeholder="Name"
                   placeholderTextColor="#666666"
-                  value={userData.name ? userData.name : state.user.name}
+                  value={String(userData.name ?? '')}
                   onChangeText={txt => setUserData({...userData, name: txt})}
                   autoCorrect={false}
                   style={styles.textInput}
@@ -124,9 +121,7 @@ const EditProfileScreen = props => {
                   placeholderTextColor="#666666"
                   keyboardType="number-pad"
                   autoCorrect={false}
-                  value={
-                    userData.phone ? String(userData.phone) : state.user.phone
-                  }
+                  value={String(userData.phone ?? '')}
                   onChangeText={txt => setUserData({...userData, phone: txt})}
                   style={styles.textInput}
                 />
@@ -139,9 +134,7 @@ const EditProfileScreen = props => {
                   placeholderTextColor="#666666"
                   autoCorrect={false}
                   keyboardType="number-pad"
-                  value={
-                    userData.dist ? String(userData.dist) : state.user.dist
-                  }
+                  value={String(userData.dist ?? '')}
                   onChangeText={txt => setUserData({...userData, dist: txt})}
                   style={styles.textInput}
                 />
@@ -156,16 +149,16 @@ const EditProfileScreen = props => {
                   placeholder="City"
                   placeholderTextColor="#666666"
                   autoCorrect={false}
-                  value={userData.city ? userData.city : state.user.city}
+                  value={String(userData.city ?? '')}
                   onChangeText={txt => setUserData({...userData, city: txt})}
                   style={styles.textInput}
                 />
               </View>
             </View>
+            <FormButton buttonTitle="Update" onPress={upadateProfile} />
           </ScrollView>
         </KeyboardAvoidingView>
-        <FormButton buttonTitle="Update" onPress={upadateProfile} />
-      </Animated.View>
+      </View>
     </View>
   );
 };

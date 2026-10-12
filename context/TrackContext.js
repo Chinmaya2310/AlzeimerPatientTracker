@@ -4,8 +4,6 @@ const trackReducer = (state, action) => {
   switch (action.type) {
     case 'fetch_tracks':
       return action.payload;
-   // case 'send_message':
-     // return action.payload;
     default:
       return state;
   }
@@ -13,7 +11,7 @@ const trackReducer = (state, action) => {
 
 const fetchTracks = dispatch => async () => {
   const response = await trackerApi.get('/tracks');
-  //console.log('It is ', response.data);
+  console.log('It is ', response.data);
   dispatch({type: 'fetch_tracks', payload: response.data});
 };
 
@@ -21,7 +19,6 @@ const createTrack = dispatch => async (name, locations) => {
   // console.log(name, locations.length);
   await trackerApi.post('/tracks', {name, locations});
 };
-
 
 export const {Provider, Context} = createDataContext(
   trackReducer,

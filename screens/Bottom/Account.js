@@ -66,7 +66,6 @@ const Account = ({navigation, route}) => {
                 style={styles.userBtn}
                 onPress={() => {
                   signout();
-                  navigation.navigate('Login');
                 }}>
                 <Text style={styles.userBtnTxt}>Logout</Text>
               </TouchableOpacity>

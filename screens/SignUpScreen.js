@@ -11,7 +11,18 @@ const SignupScreen = ({navigation}) => {
   const [phone, setPhone] = useState();
   const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
-  console.log(state);
+  const [formError, setFormError] = useState('');
+  const onSignUp = () => {
+    if (!email || !password || !phone) {
+      return setFormError('Please fill in email, password and phone number');
+    }
+    if (password !== confirmPassword) {
+      return setFormError('Passwords do not match');
+    }
+    setFormError('');
+    signup({email, password, phone});
+  };
+  // console.log(state);
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Create an account</Text>
@@ -46,15 +57,20 @@ const SignupScreen = ({navigation}) => {
         onChangeText={userPhone => setPhone(userPhone)}
         placeholderText="Phone Number"
         iconType="phone"
-        keyboardType="email-address"
+        keyboardType="phone-pad"
         autoCapitalize="none"
         autoCorrect={false}
       />
 
       <FormButton
         buttonTitle="Sign Up"
-        onPress={() => signup({email, password, phone})}
+        onPress={onSignUp}
       />
+      {formError ? (
+        <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
+          {formError}
+        </Text>
+      ) : null}
       {state.errMessage ? (
         <Text style={[styles.color_textPrivate, {color: '#e88832'}]}>
           {state.errMessage}

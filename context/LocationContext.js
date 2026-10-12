@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import trackerApi from '../apis/tracker';
 
 import createDataContext from './createDataContext';
@@ -17,8 +18,8 @@ const locationReducer = (state, action) => {
       return {...state, user: action.payload};
     case 'reset':
       return {...state, name: '', locations: []};
-    case 'send_message':
-      return action.payload;
+    case 'nothing_user':
+      return state;
     default:
       return state;
   }
@@ -54,15 +55,32 @@ const getUser = dispatch => async () => {
     });
   }
 };
-const sendMessage = dispatch => async (currentLocation, dist) =>{
-  const response=await trackerApi.post('/sendMessage',{currentLocation, dist});
-  console.log(phone);
-  dispatch({type:'send_message',payload:response.data});
-};
 
+const sendLocation = dispatch => async ({currentLocation, dist}) => {
+  try {
+    const response = await trackerApi.post('/sendMessage', {
+      currentLocation,
+      dist,
+    });
+    dispatch({type: 'nothing_user', payload: response});
+  } catch (err) {
+    dispatch({
+      type: 'add_error',
+      payload: 'Something went wrong with signup',
+    });
+  }
+};
 
 export const {Context, Provider} = createDataContext(
   locationReducer,
-  {startRecording, stopRecording, addLocation, changeName, reset, getUser,sendMessage},
+  {
+    startRecording,
+    stopRecording,
+    addLocation,
+    changeName,
+    reset,
+    getUser,
+    sendLocation,
+  },
   {name: '', recording: false, locations: [], currentLocation: null, user: {}},
 );

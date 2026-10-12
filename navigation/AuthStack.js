@@ -27,7 +27,7 @@ const AuthStack = () => {
   if (isFirstLaunch === null) {
     return null;
   } else if (isFirstLaunch === true) {
-    routeName = 'OnBoarding';
+    routeName = 'Onboarding';
   } else {
     routeName = 'Login';
   }

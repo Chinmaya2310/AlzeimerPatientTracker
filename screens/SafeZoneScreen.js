@@ -39,16 +39,21 @@ const SafeZoneScreen = ({navigation, route}) => {
   const [custom, setCustom] = useState('');
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const mapRef = useRef(null);
 
-  const locate = () => {
+  const locate = (fromButton = false) => {
     setLocating(true);
     setError('');
+    setNotice('');
     Geolocation.getCurrentPosition(
       pos => {
         const c = {latitude: pos.coords.latitude, longitude: pos.coords.longitude};
         setCenter(c);
         setLocating(false);
+        if (fromButton) {
+          setNotice('Home moved to your current location. Tap Save to keep it.');
+        }
         mapRef.current && mapRef.current.animateToRegion(regionFor(c, radiusKm), 400);
       },
       () => {
@@ -132,7 +137,10 @@ const SafeZoneScreen = ({navigation, route}) => {
             ref={mapRef}
             style={styles.map}
             initialRegion={regionFor(center, radiusKm)}
-            onPress={e => setCenter(e.nativeEvent.coordinate)}>
+            onPress={e => {
+              setCenter(e.nativeEvent.coordinate);
+              setNotice('');
+            }}>
             <Circle
               center={center}
               radius={radiusKm * 1000}
@@ -156,7 +164,7 @@ const SafeZoneScreen = ({navigation, route}) => {
         )}
       </View>
 
-      <TouchableOpacity style={styles.locate} onPress={locate} disabled={locating}>
+      <TouchableOpacity style={styles.locate} onPress={() => locate(true)} disabled={locating}>
         <Ionicons name="locate" size={18} color={colors.primary} />
         <Text style={styles.locateText}>{locating ? 'Locating…' : 'Use my current location'}</Text>
       </TouchableOpacity>
@@ -185,6 +193,7 @@ const SafeZoneScreen = ({navigation, route}) => {
       />
       <Text style={styles.summary}>Alert if the patient goes more than {formatKm(radiusKm)} from home.</Text>
 
+      {notice ? <Text style={styles.notice}>{notice}</Text> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <FormButton buttonTitle="Save safe zone" onPress={save} />
       {firstTime ? (
@@ -233,6 +242,7 @@ const styles = StyleSheet.create({
   },
   summary: {fontSize: 13, color: colors.muted, marginTop: 8},
   error: {color: colors.danger, marginTop: 10},
+  notice: {color: colors.success, marginTop: 10},
 });
 
 export default SafeZoneScreen;

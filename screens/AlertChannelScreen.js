@@ -33,7 +33,7 @@ const Option = ({selected, icon, title, detail, badge, onPress}) => (
 const AlertChannelScreen = () => {
   const {state, getInfoUser, setUser} = useContext(UserContext);
   const user = state.user || {};
-  const [waitingForStart, setWaitingForStart] = useState(false);
+  const [step, setStep] = useState(null); // null | 'start' | 'phone'
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(null); // {text, ok}
 
@@ -54,9 +54,11 @@ const AlertChannelScreen = () => {
     setBusy(false);
   };
 
+  const verified = !!(user.telegramChatId && user.telegramPhone);
+
   const choose = channel =>
     run(async () => {
-      if (channel === 'telegram' && !user.telegramChatId) {
+      if (channel === 'telegram' && !verified) {
         return connectTelegram();
       }
       const res = await trackerApi.put('/alert-channel', {channel});
@@ -65,15 +67,19 @@ const AlertChannelScreen = () => {
 
   const connectTelegram = async () => {
     const res = await trackerApi.post('/telegram/link');
-    setWaitingForStart(true);
+    setStep('start');
     await Linking.openURL(res.data.url);
   };
 
   const verify = () =>
     run(async () => {
       const res = await trackerApi.post('/telegram/verify');
+      if (res.data.step === 'share_phone') {
+        setStep('phone');
+        return;
+      }
       setUser(res.data);
-      setWaitingForStart(false);
+      setStep(null);
       setMessage({text: 'Telegram connected. Alerts will arrive there for free.', ok: true});
     });
 
@@ -103,9 +109,11 @@ const AlertChannelScreen = () => {
         title="Telegram"
         badge="Free"
         detail={
-          user.telegramChatId
-            ? `Connected${user.telegramName ? ` as ${user.telegramName}` : ''}. Message plus a map pin.`
-            : 'Message plus a map pin in the SafeWalk Telegram bot. Connect once.'
+          verified
+            ? `Connected${user.telegramName ? ` as ${user.telegramName}` : ''} (${user.telegramPhone}). Message plus a map pin.`
+            : user.telegramChatId
+            ? 'Reconnect needed: confirm your Telegram uses the registered phone number.'
+            : `Message plus a map pin. Connect the Telegram account for ${user.phone || 'your phone number'}.`
         }
         onPress={() => choose('telegram')}
       />
@@ -118,13 +126,21 @@ const AlertChannelScreen = () => {
         onPress={() => choose('sms')}
       />
 
-      {waitingForStart ? (
+      {step ? (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Finish connecting Telegram</Text>
-          <Text style={styles.cardText}>
-            In Telegram, tap Start in the SafeWalk bot chat, then come back here.
+          <Text style={styles.cardTitle}>
+            {step === 'start' ? 'Step 1 of 2: tap Start' : 'Step 2 of 2: share your number'}
           </Text>
-          <FormButton buttonTitle="I've pressed Start" onPress={verify} disabled={busy} />
+          <Text style={styles.cardText}>
+            {step === 'start'
+              ? 'In Telegram, tap Start in the SafeWalk bot chat, then come back here.'
+              : `In Telegram, tap “Share my phone number”. It must be ${user.phone}. Then come back here.`}
+          </Text>
+          <FormButton
+            buttonTitle={step === 'start' ? "I've pressed Start" : "I've shared my number"}
+            onPress={verify}
+            disabled={busy}
+          />
           <FormButton buttonTitle="Open Telegram again" variant="secondary" onPress={() => run(connectTelegram)} />
         </View>
       ) : null}
@@ -139,6 +155,9 @@ const AlertChannelScreen = () => {
         onPress={sendTest}
         disabled={busy}
       />
+      {user.telegramChatId && !verified && !step ? (
+        <FormButton buttonTitle="Reconnect Telegram" onPress={() => run(connectTelegram)} />
+      ) : null}
       {user.telegramChatId ? (
         <TouchableOpacity style={styles.link} onPress={disconnect}>
           <Text style={styles.linkText}>Disconnect Telegram</Text>

@@ -1,4 +1,4 @@
-import React, {useEffect, useContext, useRef} from 'react';
+import React, {useEffect, useContext} from 'react';
 import {View, Text, StyleSheet, ActivityIndicator, TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import MapView, {Polyline, Circle, Marker} from 'react-native-maps';
@@ -8,17 +8,11 @@ import {Context as UserContext} from '../context/UserContext';
 import {distanceKm, formatKm, formatDateTime} from '../utils/geo';
 import {colors, card} from '../theme';
 
-// Readings outside the circle needed before alerting (GPS can jump 20-50 m)
-const OUTSIDE_READINGS = 2;
-// Re-arm the alert only once the patient is clearly back inside
-const REARM_FRACTION = 0.9;
-
 const Map = () => {
   const navigation = useNavigation();
   const {state: userState, getInfoUser} = useContext(UserContext);
   const {
-    state: {currentLocation, locations, recording, lastAlert},
-    sendLocation,
+    state: {currentLocation, locations, recording, lastAlert, trackingError},
   } = useContext(LocationContext);
   const safeKm = userState.user.dist;
   const home = userState.user.homeLocation;
@@ -30,26 +24,7 @@ const Map = () => {
   const dist = home && currentLocation ? distanceKm(home, currentLocation.coords) : 0;
   const outside = !!(home && safeKm && dist > safeKm);
 
-  // One alert per exit: needs consecutive readings outside, re-arms well inside
-  const outsideCount = useRef(0);
-  const alertSent = useRef(false);
-  useEffect(() => {
-    if (!recording || !home || !currentLocation || !safeKm) {
-      return;
-    }
-    if (dist > safeKm) {
-      outsideCount.current += 1;
-      if (outsideCount.current >= OUTSIDE_READINGS && !alertSent.current) {
-        alertSent.current = true;
-        sendLocation({currentLocation, dist});
-      }
-    } else {
-      outsideCount.current = 0;
-      if (dist < safeKm * REARM_FRACTION) {
-        alertSent.current = false;
-      }
-    }
-  }, [currentLocation]);
+  // Alerts are decided by the backend for each tracked point (services/geofence.js there)
 
   if (!currentLocation) {
     return <ActivityIndicator size="large" color={colors.primary} style={{marginTop: 120}} />;
@@ -79,7 +54,7 @@ const Map = () => {
         ? lastAlert.sent
           ? `Caregiver alerted by ${lastAlert.channel === 'telegram' ? 'Telegram' : 'SMS'} at ${formatDateTime(lastAlert.createdAt)}`
           : 'Could not send the alert. Check the alert settings in Profile.'
-        : 'Alerting caregiver…',
+        : 'Checking… the caregiver is alerted after two readings outside.',
     };
   } else {
     status = {
@@ -133,6 +108,9 @@ const Map = () => {
         <View style={styles.statusText}>
           <Text style={[styles.statusTitle, {color: status.color}]}>{status.title}</Text>
           {status.detail ? <Text style={styles.statusDetail}>{status.detail}</Text> : null}
+          {trackingError ? (
+            <Text style={[styles.statusDetail, {color: colors.danger}]}>{trackingError}</Text>
+          ) : null}
         </View>
       </TouchableOpacity>
     </View>

@@ -11,13 +11,9 @@ import {colors} from '../../theme';
 const Record = () => {
   const {state, addLocation} = useContext(LocationContext);
   const isFocused = useIsFocused();
-  const callback = useCallback(
-    location => {
-      addLocation(location, state.recording);
-    },
-    [state.recording],
-  );
-  const [err] = useLocation(isFocused || state.recording, callback);
+  // while recording, the background service supplies locations; this only previews the map
+  const callback = useCallback(location => addLocation(location, false), []);
+  const [err] = useLocation(isFocused && !state.recording, callback);
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">

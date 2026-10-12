@@ -6,6 +6,7 @@ import Account from './Bottom/Account';
 import Maps from './Bottom/Maps';
 import Record from './Bottom/Record';
 import {colors} from '../theme';
+import TrackingBridge from '../components/TrackingBridge';
 
 const Tab = createBottomTabNavigator();
 const tabs = [
@@ -17,6 +18,8 @@ const tabs = [
 
 const Landing = () => {
   return (
+    <>
+    <TrackingBridge />
     <Tab.Navigator
       initialRouteName="Home"
       tabBarOptions={{
@@ -38,6 +41,7 @@ const Landing = () => {
         />
       ))}
     </Tab.Navigator>
+    </>
   );
 };
 

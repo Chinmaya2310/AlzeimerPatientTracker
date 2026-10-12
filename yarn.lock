@@ -3607,6 +3607,11 @@ event-target-shim@^5.0.0, event-target-shim@^5.0.1:
   resolved "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
+eventemitter3@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-4.0.7.tgz"
+  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
+
 exec-sh@^0.3.2:
   version "0.3.6"
   resolved "https://registry.npmjs.org/exec-sh/-/exec-sh-0.3.6.tgz"
@@ -6786,6 +6791,13 @@ react-is@^16.8.1:
   version "16.13.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+react-native-background-actions@^2.6.7:
+  version "2.6.7"
+  resolved "https://registry.npmjs.org/react-native-background-actions/-/react-native-background-actions-2.6.7.tgz"
+  integrity sha512-qjHeks9EbLIXeb2xn3AR0eLVlUh/sAboKt0tI3ZN8leEEL1xmZUvpbk0fN6RKRpxpv7ATVHgWjGMK1FNoYh+Ug==
+  dependencies:
+    eventemitter3 "^4.0.7"
 
 react-native-codegen@^0.0.6:
   version "0.0.6"

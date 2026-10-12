@@ -16,14 +16,20 @@ Originally built in 2021 as a team project with [Abhinav Anand](https://github.c
 
 ## Features
 - **Safe zone set by the caregiver**: right after sign-up (or later from Profile), pick the patient's home on a map, starting from the current location, by dragging the pin or tapping the map, and choose the radius (200 m, 500 m, 1 km, 2 km or custom). Tracking can't start until a zone is set.
+- **Background tracking**: a walk runs in an Android foreground service ("SafeWalk is tracking a walk" notification), so it keeps working with the screen off or the app in the background. Each GPS point goes to the backend, which decides when to alert
 - **Live tracking** on Google Maps with the safe zone always shown around home (green inside, red outside)
-- **Alerts by Telegram (free) or SMS (Fast2SMS, paid)**, chosen in Profile → Alerts via. Telegram is connected in one tap (opens the bot, tap Start) and sends a message plus a map pin; SMS sends a Google Maps link. A test-alert button checks the setup. Alerts are sent only after two GPS readings in a row are outside the zone (ignores GPS jumps) and re-armed once the patient is back within 90% of the radius; the app shows when the alert was sent
+- **Alerts by Telegram (free) or SMS (Fast2SMS, paid)**, chosen in Profile → Alerts via. Telegram is connected by tapping Start in the bot and sharing your phone number, which must match the number registered in the app and sends a message plus a map pin; SMS sends a Google Maps link. A test-alert button checks the setup. Alerts are sent only after two GPS readings in a row are outside the zone (ignores GPS jumps) and re-armed once the patient is back within 90% of the radius; the app shows when the alert was sent
 - **Dashboard** with tracking status, safe distance, walks saved and recent alerts (tap an alert to open its location)
 - **Walk history** with distance, duration and the route between start and end pins
 - **Profile** with the caregiver's phone number for alerts and the safe zone
 - Sign up / sign in with JWT; the login persists across app restarts
 
 ## Run it (Android emulator)
+Google Maps needs an API key (Maps SDK for Android) in `android/local.properties`, which is not committed:
+```
+MAPS_API_KEY=AIza...
+```
+
 Requirements: Node 20, Java 11 (Gradle 6.7), Android SDK with an emulator, the backend running on port 3001.
 
 ```bash

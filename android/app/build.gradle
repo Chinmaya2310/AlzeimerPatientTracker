@@ -136,6 +136,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // Google Maps key from android/local.properties (MAPS_API_KEY=...), kept out of git
+        def localProps = new Properties()
+        def localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localFile.withInputStream { localProps.load(it) }
+        }
+        manifestPlaceholders = [MAPS_API_KEY: localProps.getProperty("MAPS_API_KEY", "")]
     }
     splits {
         abi {

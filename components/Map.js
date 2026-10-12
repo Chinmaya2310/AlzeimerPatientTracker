@@ -27,7 +27,14 @@ const Map = () => {
   // Alerts are decided by the backend for each tracked point (services/geofence.js there)
 
   if (!currentLocation) {
-    return <ActivityIndicator size="large" color={colors.primary} style={{marginTop: 120}} />;
+    return (
+      <View style={styles.waiting}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.waitingText}>
+          Finding your location… If this takes long, check that location is on, or step outside or near a window.
+        </Text>
+      </View>
+    );
   }
 
   const zoneColor = outside ? colors.danger : colors.success;
@@ -119,6 +126,8 @@ const Map = () => {
 
 const styles = StyleSheet.create({
   mapWrap: {...card, padding: 0, overflow: 'hidden'},
+  waiting: {...card, alignItems: 'center', paddingVertical: 40},
+  waitingText: {color: colors.muted, textAlign: 'center', marginTop: 12, lineHeight: 20},
   map: {height: 320},
   dot: {
     width: 20,

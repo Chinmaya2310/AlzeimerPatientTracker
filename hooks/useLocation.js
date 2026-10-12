@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect, useContext} from 'react';
 import Geolocation from '@react-native-community/geolocation';
+import {quickPosition} from '../utils/location';
 
 export default (shouldTrack, callback) => {
   const [err, setErr] = useState(null);
@@ -12,6 +13,7 @@ export default (shouldTrack, callback) => {
         console.log(err);
       };
 
+      quickPosition(callback); // show the map at once, even indoors
       const sub = await Geolocation.watchPosition(callback, error, {
         enableHighAccuracy: true,
         timeout: 5000,

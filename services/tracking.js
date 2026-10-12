@@ -4,6 +4,7 @@
 import BackgroundService from 'react-native-background-actions';
 import Geolocation from '@react-native-community/geolocation';
 import trackerApi from '../apis/tracker';
+import {quickPosition} from '../utils/location';
 
 let listener = null;
 // The UI subscribes to {type: 'location' | 'status' | 'error', ...} events
@@ -28,6 +29,7 @@ const onPosition = async location => {
 };
 
 const task = async () => {
+  quickPosition(location => emit({type: 'preview', location})); // map only, not used for alerts
   const watchId = Geolocation.watchPosition(onPosition, err => emit({type: 'error', error: err.message}), {
     enableHighAccuracy: true,
     distanceFilter: 10, // metres

@@ -8,7 +8,9 @@ const TrackingBridge = () => {
   const {addLocation, setZoneStatus, setTrackingError} = useContext(LocationContext);
   useEffect(() => {
     setTrackingListener(event => {
-      if (event.type === 'location') {
+      if (event.type === 'preview') {
+        addLocation(event.location, false);
+      } else if (event.type === 'location') {
         addLocation(event.location, true);
       } else if (event.type === 'status') {
         setZoneStatus(event.status);

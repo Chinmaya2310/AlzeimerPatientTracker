@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import MapView, {Circle, Marker} from 'react-native-maps';
-import Geolocation from '@react-native-community/geolocation';
+import {bestPosition} from '../utils/location';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Context as UserContext} from '../context/UserContext';
 import {Context as AuthContext} from '../context/AuthContext';
@@ -46,7 +46,7 @@ const SafeZoneScreen = ({navigation, route}) => {
     setLocating(true);
     setError('');
     setNotice('');
-    Geolocation.getCurrentPosition(
+    bestPosition(
       pos => {
         const c = {latitude: pos.coords.latitude, longitude: pos.coords.longitude};
         setCenter(c);
@@ -60,7 +60,6 @@ const SafeZoneScreen = ({navigation, route}) => {
         setLocating(false);
         setError('Could not get your location. Check that location is turned on, or tap the map to place home.');
       },
-      {enableHighAccuracy: true, timeout: 15000},
     );
   };
 
